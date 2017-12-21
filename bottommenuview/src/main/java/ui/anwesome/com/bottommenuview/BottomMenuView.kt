@@ -28,10 +28,13 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             canvas.save()
             canvas.translate(x,y)
+            paint.color = Color.GRAY
+            canvas.drawCircle(0f,0f,r,paint)
             for(i in 0..1) {
                 canvas.save()
                 canvas.rotate(i*90f*(1-scale))
                 paint.strokeWidth = r/5
+                paint.color = Color.WHITE
                 paint.strokeCap = Paint.Cap.ROUND
                 canvas.drawLine(-r/2,0f,r/2,0f,paint)
                 canvas.restore()
