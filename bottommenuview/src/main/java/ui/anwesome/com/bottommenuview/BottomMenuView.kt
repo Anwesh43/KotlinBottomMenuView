@@ -18,4 +18,10 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         return true
     }
+    data class BottomMenu(var w:Float,var h:Float) {
+        fun draw(canvas:Canvas,paint:Paint,scale:Float) {
+            paint.color = Color.parseColor("#673AB7")
+            canvas.drawRect(RectF(0f,0f,h-0.9f*h*scale,w),paint)
+        }
+    }
 }
