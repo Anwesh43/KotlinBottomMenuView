@@ -44,7 +44,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         fun handleTap(x:Float,y:Float):Boolean = x>=this.x-r && x<=this.x+r && y>=this.y - r && y<=this.y+r
     }
-    data class BottomMenuContiner(var w:Float,var h:Float) {
+    data class BottomMenuContainer(var w:Float,var h:Float) {
         val state = BottomMenuState()
         var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
         var bottomMenu = BottomMenu(w,h)
@@ -73,6 +73,34 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun startUpdating(startcb:()->Unit) {
             dir = 1f-2*scale
             startcb()
+        }
+    }
+    data class BottomMenuAnimator(var container:BottomMenuContainer,var view:BottomMenuView) {
+        var animated = false
+        fun update() {
+            if(animated) {
+                container.update{ scale ->
+                    animated = false
+                }
+                try {
+                    Thread.sleep(50)
+                    view.invalidate()
+                }
+                catch(ex:Exception) {
+
+                }
+            }
+        }
+        fun startUpdating() {
+            if(!animated) {
+                container.startUpdating{
+                    animated = true
+                    view.postInvalidate()
+                }
+            }
+        }
+        fun draw(canvas:Canvas,paint:Paint) {
+            container.draw(canvas,paint)
         }
     }
 }
