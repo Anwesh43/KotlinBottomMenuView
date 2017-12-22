@@ -3,6 +3,7 @@ package ui.anwesome.com.bottommenuview
 /**
  * Created by anweshmishra on 21/12/17.
  */
+import android.app.Activity
 import android.content.*
 import android.graphics.*
 import android.view.*
@@ -23,7 +24,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
     data class BottomMenu(var w:Float,var h:Float) {
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             paint.color = Color.parseColor("#673AB7")
-            canvas.drawRect(RectF(0f,0f,h-0.9f*h*scale,w),paint)
+            canvas.drawRect(RectF(0f,h-0.9f*h*scale,w,h),paint)
         }
     }
     data class BottomMenuCircle(var x:Float,var h:Float,var r:Float,var y:Float = 0.85f*h) {
@@ -53,7 +54,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun draw(canvas:Canvas,paint:Paint) {
             bottomMenu.draw(canvas,paint,state.scale)
             bottomMenuCircle.draw(canvas,paint,state.scale)
-            canvas.drawLineIndicator(w/10,h/20,0.8f*w,state.scale,paint)
+            canvas.drawLineIndicator(w/5,h/20,0.7f*w,state.scale,paint)
         }
         fun update(stopcb:(Float)->Unit) {
             state.update(stopcb)
@@ -120,6 +121,13 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         fun handleTap() {
             animator?.startUpdating()
+        }
+    }
+    companion object {
+        fun create(activity: Activity):BottomMenuView {
+            val view = BottomMenuView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
