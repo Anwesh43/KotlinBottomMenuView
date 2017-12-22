@@ -50,6 +50,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun draw(canvas:Canvas,paint:Paint) {
             bottomMenu.draw(canvas,paint,1f)
             bottomMenuCircle.draw(canvas,paint,1f)
+            canvas.drawLineIndicator(w/10,h/20,0.8f*w,1f)
         }
         fun update(stopcb:(Float)->Unit) {
 
@@ -73,4 +74,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
             startcb()
         }
     }
+}
+fun Canvas.drawLineIndicator(x:Float,y:Float,w:Float,scale:Float,paint:Paint) {
+    paint.strokeWidth = w/15
+    paint.color = Color.parseColor("#00E676")
+    drawLine(x,y,x+w*scale,y,paint)
 }
