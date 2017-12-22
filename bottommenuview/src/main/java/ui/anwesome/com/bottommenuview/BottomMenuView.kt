@@ -132,6 +132,57 @@ class BottomMenuView(ctx:Context):View(ctx) {
             return view
         }
     }
+    data class BottomMenuItem(var text:String,var x:Float,var y:Float,var clickListener:()->Unit,var tw:Float = 0f,var th:Float = 0f) {
+        var itemClickListener:BottomMenuClickListener =  BottomMenuClickListener(clickListener)
+        val state = BottomMenuItemState()
+        fun draw(canvas:Canvas,paint:Paint) {
+            if(tw == 0f && th == 0f) {
+                tw = paint.measureText(text)
+                th = paint.textSize
+            }
+            canvas.save()
+            canvas.translate(x,y)
+            canvas.save()
+            canvas.scale(state.scale,state.scale)
+            paint.color = Color.parseColor("#88EEEEEE")
+            canvas.drawRoundRect(RectF(-tw/2,-th/2,tw/2,th/2),tw/10,tw/10,paint)
+            canvas.restore()
+            canvas.drawText(text,-tw/2,th/10,paint)
+            canvas.restore()
+        }
+        fun update(stopcb: () -> Unit) {
+            state.update {
+                itemClickListener.clickListener?.invoke()
+                stopcb()
+            }
+        }
+        fun handleTap(startcb:()->Unit,x:Float,y:Float) {
+            if(x>=this.x-tw/2 && x<=this.x+tw/2 && y>=this.y-th/2 && y<=this.y+th/2) {
+                state.startUpdating {
+                    startcb()
+                }
+            }
+        }
+    }
+    data class BottomMenuItemState(var scale:Float = 0f,var deg:Float = 0f,var dir:Float = 0f) {
+        fun update(stopcb: () -> Unit) {
+            deg += 20*dir
+            scale = Math.sin(deg*Math.PI/180).toFloat()
+            if(deg > 180f) {
+                deg = 0f
+                scale = 0f
+                dir = 0f
+                stopcb()
+            }
+        }
+        fun startUpdating(startcb:()->Unit) {
+            if(dir == 0f) {
+                dir = 1f
+                startcb()
+            }
+        }
+    }
+    data class BottomMenuClickListener(var clickListener:()->Unit)
 }
 fun Canvas.drawLineIndicator(x:Float,y:Float,w:Float,scale:Float,paint:Paint) {
     paint.strokeWidth = w/15
