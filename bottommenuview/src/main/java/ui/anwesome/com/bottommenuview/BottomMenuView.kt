@@ -45,18 +45,19 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun handleTap(x:Float,y:Float):Boolean = x>=this.x-r && x<=this.x+r && y>=this.y - r && y<=this.y+r
     }
     data class BottomMenuContiner(var w:Float,var h:Float) {
+        val state = BottomMenuState()
         var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
         var bottomMenu = BottomMenu(w,h)
         fun draw(canvas:Canvas,paint:Paint) {
-            bottomMenu.draw(canvas,paint,1f)
-            bottomMenuCircle.draw(canvas,paint,1f)
-            canvas.drawLineIndicator(w/10,h/20,0.8f*w,1f)
+            bottomMenu.draw(canvas,paint,state.scale)
+            bottomMenuCircle.draw(canvas,paint,state.scale)
+            canvas.drawLineIndicator(w/10,h/20,0.8f*w,state.scale,paint)
         }
         fun update(stopcb:(Float)->Unit) {
-
+            state.update(stopcb)
         }
         fun startUpdating(startcb:()->Unit) {
-
+            state.startUpdating(startcb)
         }
     }
     data class BottomMenuState(var scale:Float = 0f,var dir:Float = 0f,var prevScale:Float = 0f) {
