@@ -38,7 +38,8 @@ class BottomMenuView(ctx:Context):View(ctx) {
         var y = h/20
         fun addMenu(menu:String,clickListener: () -> Unit) {
             val bottomMenu = BottomMenuItem(menu,w/2,y,clickListener)
-            y += h/20
+            menus.add(bottomMenu)
+            y += h/15
         }
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             paint.color = Color.parseColor("#673AB7")
@@ -54,9 +55,11 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         fun update(stopcb: () -> Unit) {
             animatingMenus.forEach {
-                animatingMenus.remove(it)
-                if(animatingMenus.size == 0) {
-                    stopcb()
+                it.update {
+                    animatingMenus.remove(it)
+                    if(animatingMenus.size == 0) {
+                        stopcb()
+                    }
                 }
             }
         }
@@ -64,10 +67,10 @@ class BottomMenuView(ctx:Context):View(ctx) {
             menus.forEach {
                 if(it.handleTap({
                     animatingMenus.add(it)
-                    if(animatingMenus.size == 0) {
+                    if(animatingMenus.size == 1) {
                         startcb()
                     }
-                },x,y)) {
+                },x,y-h/10)) {
                     return
                 }
             }
@@ -210,7 +213,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
             canvas.save()
             canvas.translate(x,y)
             canvas.save()
-            canvas.scale(state.scale,state.scale)
+            canvas.scale(1.5f*state.scale,1.5f*state.scale)
             paint.color = Color.parseColor("#88EEEEEE")
             canvas.drawRoundRect(RectF(-tw/2,-th/2,tw/2,th/2),tw/10,tw/10,paint)
             canvas.restore()
