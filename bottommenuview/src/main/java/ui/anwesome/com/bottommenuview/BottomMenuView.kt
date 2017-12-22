@@ -7,6 +7,8 @@ import android.app.Activity
 import android.content.*
 import android.graphics.*
 import android.view.*
+import java.util.concurrent.ConcurrentLinkedQueue
+
 class BottomMenuView(ctx:Context):View(ctx) {
     val renderer = BottomMenuRenderer(this)
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -22,9 +24,44 @@ class BottomMenuView(ctx:Context):View(ctx) {
         return true
     }
     data class BottomMenuSlide(var w:Float,var h:Float) {
+        val menus:ConcurrentLinkedQueue<BottomMenuItem> = ConcurrentLinkedQueue()
+        val animatingMenus:ConcurrentLinkedQueue<BottomMenuItem> = ConcurrentLinkedQueue()
+        var y = h/20
+        fun addMenu(menu:String,clickListener: () -> Unit) {
+            val bottomMenu = BottomMenuItem(menu,w/2,y,clickListener)
+            y += h/20
+        }
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             paint.color = Color.parseColor("#673AB7")
-            canvas.drawRect(RectF(0f,h-0.9f*h*scale,w,h),paint)
+            val y = h - 0.9f*h*scale
+            canvas.save()
+            canvas.translate(0f,y)
+            canvas.drawRect(RectF(0f,0f,w,h-y),paint)
+            paint.textSize = h/30
+            menus.forEach {
+                it.draw(canvas,paint)
+            }
+            canvas.restore()
+        }
+        fun update(stopcb: () -> Unit) {
+            animatingMenus.forEach {
+                animatingMenus.remove(it)
+                if(animatingMenus.size == 0) {
+                    stopcb()
+                }
+            }
+        }
+        fun handleTap(x:Float,y:Float,startcb: () -> Unit) {
+            menus.forEach {
+                if(it.handleTap({
+                    animatingMenus.add(it)
+                    if(animatingMenus.size == 0) {
+                        startcb()
+                    }
+                },x,y)) {
+                    return
+                }
+            }
         }
     }
     data class BottomMenuCircle(var x:Float,var h:Float,var r:Float,var y:Float = 0.85f*h) {
@@ -49,6 +86,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
     }
     data class BottomMenuContainer(var w:Float,var h:Float) {
         val state = BottomMenuState()
+
         var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
         var bottomMenu = BottomMenuSlide(w,h)
         fun draw(canvas:Canvas,paint:Paint) {
@@ -156,12 +194,14 @@ class BottomMenuView(ctx:Context):View(ctx) {
                 stopcb()
             }
         }
-        fun handleTap(startcb:()->Unit,x:Float,y:Float) {
+        fun handleTap(startcb:()->Unit,x:Float,y:Float):Boolean {
             if(x>=this.x-tw/2 && x<=this.x+tw/2 && y>=this.y-th/2 && y<=this.y+th/2) {
                 state.startUpdating {
                     startcb()
                 }
+                return true
             }
+            return false
         }
     }
     data class BottomMenuItemState(var scale:Float = 0f,var deg:Float = 0f,var dir:Float = 0f) {
