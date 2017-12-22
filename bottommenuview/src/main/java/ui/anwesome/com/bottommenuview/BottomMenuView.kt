@@ -15,6 +15,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
     override fun onDraw(canvas:Canvas) {
         renderer.render(canvas,paint)
     }
+    fun addMenu(text: String,clickListener: () -> Unit) {
+        renderer.addMenu(text, clickListener)
+    }
     override fun onTouchEvent(event:MotionEvent):Boolean {
         when(event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -89,6 +92,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
 
         var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
         var bottomMenu = BottomMenuSlide(w,h)
+        fun addMenu(text:String,clickListener: () -> Unit) {
+            bottomMenu.addMenu(text,clickListener)
+        }
         fun draw(canvas:Canvas,paint:Paint) {
             bottomMenu.draw(canvas,paint,state.scale)
             bottomMenuCircle.draw(canvas,paint,state.scale)
@@ -96,10 +102,19 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         fun update(stopcb:(Float)->Unit) {
             state.update(stopcb)
+            if(state.scale == 1f) {
+                bottomMenu.update({
+                    stopcb(1f)
+                })
+            }
         }
         fun startUpdating(x:Float,y:Float,startcb:()->Unit) {
             if(bottomMenuCircle.handleTap(x,y)) {
                 state.startUpdating(startcb)
+                return
+            }
+            if(state.scale == 1f) {
+                bottomMenu.handleTap(x, y, startcb)
             }
         }
     }
@@ -120,6 +135,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
     }
     data class BottomMenuAnimator(var container:BottomMenuContainer,var view:BottomMenuView) {
         var animated = false
+        fun addMenu(text:String,clickListener: () -> Unit) {
+            container.addMenu(text, clickListener)
+        }
         fun update() {
             if(animated) {
                 container.update{ scale ->
@@ -148,6 +166,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
     }
     data class BottomMenuRenderer(var view:BottomMenuView,var time:Int = 0) {
         var animator:BottomMenuAnimator?=null
+        fun addMenu(text:String,clickListener: () -> Unit) {
+            animator?.addMenu(text,clickListener)
+        }
         fun render(canvas:Canvas,paint:Paint) {
             if(time == 0) {
                 val w = canvas.width.toFloat()
