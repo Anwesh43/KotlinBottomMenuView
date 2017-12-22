@@ -24,10 +24,11 @@ class BottomMenuView(ctx:Context):View(ctx) {
             canvas.drawRect(RectF(0f,0f,h-0.9f*h*scale,w),paint)
         }
     }
-    data class BottomMenuCircle(var x:Float,var h:Float,var r:Float) {
+    data class BottomMenuCircle(var x:Float,var h:Float,var r:Float,var y:Float = 0.85f*h) {
         fun draw(canvas: Canvas, paint: Paint, scale: Float) {
+            y = 0.85f*h - 0.8f*h*scale
             canvas.save()
-            canvas.translate(x, 0.85f*h - 0.8f*h*scale)
+            canvas.translate(x, y)
             paint.color = Color.GRAY
             canvas.drawCircle(0f, 0f, r, paint)
             for (i in 0..1) {
@@ -42,5 +43,19 @@ class BottomMenuView(ctx:Context):View(ctx) {
             canvas.restore()
         }
         fun handleTap(x:Float,y:Float):Boolean = x>=this.x-r && x<=this.x+r && y>=this.y - r && y<=this.y+r
+    }
+    data class BottomMenuContiner(var w:Float,var h:Float) {
+        var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
+        var bottomMenu = BottomMenu(w,h)
+        fun draw(canvas:Canvas,paint:Paint) {
+            bottomMenu.draw(canvas,paint,1f)
+            bottomMenuCircle.draw(canvas,paint,1f)
+        }
+        fun update(stopcb:(Float)->Unit) {
+
+        }
+        fun startUpdating(startcb:()->Unit) {
+
+        }
     }
 }
