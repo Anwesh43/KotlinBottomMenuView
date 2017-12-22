@@ -7,16 +7,22 @@ import android.app.Activity
 import android.content.*
 import android.graphics.*
 import android.view.*
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class BottomMenuView(ctx:Context):View(ctx) {
     val renderer = BottomMenuRenderer(this)
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val menus:LinkedList<MenuItem> = LinkedList()
+    data class MenuItem(var text:String,var clickListener: () -> Unit)
+    fun addToParent(activity: Activity) {
+        activity.setContentView(this)
+    }
     override fun onDraw(canvas:Canvas) {
         renderer.render(canvas,paint)
     }
     fun addMenu(text: String,clickListener: () -> Unit) {
-        renderer.addMenu(text, clickListener)
+        menus.add(MenuItem(text,clickListener))
     }
     override fun onTouchEvent(event:MotionEvent):Boolean {
         when(event.action) {
@@ -174,6 +180,9 @@ class BottomMenuView(ctx:Context):View(ctx) {
                 val w = canvas.width.toFloat()
                 val h = canvas.height.toFloat()
                 animator = BottomMenuAnimator(BottomMenuContainer(w,h),view)
+                view.menus.forEach { menuItem ->
+                    animator?.addMenu(menuItem.text,menuItem.clickListener)
+                }
             }
             canvas.drawColor(Color.parseColor("#212121"))
             animator?.draw(canvas,paint)
@@ -187,7 +196,6 @@ class BottomMenuView(ctx:Context):View(ctx) {
     companion object {
         fun create(activity: Activity):BottomMenuView {
             val view = BottomMenuView(activity)
-            activity.setContentView(view)
             return view
         }
     }
@@ -206,6 +214,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
             paint.color = Color.parseColor("#88EEEEEE")
             canvas.drawRoundRect(RectF(-tw/2,-th/2,tw/2,th/2),tw/10,tw/10,paint)
             canvas.restore()
+            paint.color = Color.WHITE
             canvas.drawText(text,-tw/2,th/10,paint)
             canvas.restore()
         }
