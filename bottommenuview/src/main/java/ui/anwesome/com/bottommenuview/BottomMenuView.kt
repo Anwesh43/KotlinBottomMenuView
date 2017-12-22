@@ -21,7 +21,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
         }
         return true
     }
-    data class BottomMenu(var w:Float,var h:Float) {
+    data class BottomMenuSlide(var w:Float,var h:Float) {
         fun draw(canvas:Canvas,paint:Paint,scale:Float) {
             paint.color = Color.parseColor("#673AB7")
             canvas.drawRect(RectF(0f,h-0.9f*h*scale,w,h),paint)
@@ -50,7 +50,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
     data class BottomMenuContainer(var w:Float,var h:Float) {
         val state = BottomMenuState()
         var bottomMenuCircle = BottomMenuCircle(w/10,h,h/20)
-        var bottomMenu = BottomMenu(w,h)
+        var bottomMenu = BottomMenuSlide(w,h)
         fun draw(canvas:Canvas,paint:Paint) {
             bottomMenu.draw(canvas,paint,state.scale)
             bottomMenuCircle.draw(canvas,paint,state.scale)
