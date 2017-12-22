@@ -103,6 +103,23 @@ class BottomMenuView(ctx:Context):View(ctx) {
             container.draw(canvas,paint)
         }
     }
+    data class BottomMenuRenderer(var view:BottomMenuView,var time:Int = 0) {
+        var animator:BottomMenuAnimator?=null
+        fun render(canvas:Canvas,paint:Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                animator = BottomMenuAnimator(BottomMenuContainer(w,h),view)
+            }
+            canvas.drawColor(Color.parseColor("#212121"))
+            animator?.draw(canvas,paint)
+            animator?.update()
+            time++
+        }
+        fun handleTap() {
+            animator?.startUpdating()
+        }
+    }
 }
 fun Canvas.drawLineIndicator(x:Float,y:Float,w:Float,scale:Float,paint:Paint) {
     paint.strokeWidth = w/15
