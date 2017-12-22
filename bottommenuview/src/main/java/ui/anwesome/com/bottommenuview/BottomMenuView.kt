@@ -16,7 +16,7 @@ class BottomMenuView(ctx:Context):View(ctx) {
     override fun onTouchEvent(event:MotionEvent):Boolean {
         when(event.action) {
             MotionEvent.ACTION_DOWN -> {
-                renderer.handleTap()
+                renderer.handleTap(event.x,event.y)
             }
         }
         return true
@@ -59,8 +59,10 @@ class BottomMenuView(ctx:Context):View(ctx) {
         fun update(stopcb:(Float)->Unit) {
             state.update(stopcb)
         }
-        fun startUpdating(startcb:()->Unit) {
-            state.startUpdating(startcb)
+        fun startUpdating(x:Float,y:Float,startcb:()->Unit) {
+            if(bottomMenuCircle.handleTap(x,y)) {
+                state.startUpdating(startcb)
+            }
         }
     }
     data class BottomMenuState(var scale:Float = 0f,var dir:Float = 0f,var prevScale:Float = 0f) {
@@ -94,12 +96,12 @@ class BottomMenuView(ctx:Context):View(ctx) {
                 }
             }
         }
-        fun startUpdating() {
+        fun startUpdating(x:Float,y:Float) {
             if(!animated) {
-                container.startUpdating{
+                container.startUpdating(x,y,{
                     animated = true
                     view.postInvalidate()
-                }
+                })
             }
         }
         fun draw(canvas:Canvas,paint:Paint) {
@@ -119,8 +121,8 @@ class BottomMenuView(ctx:Context):View(ctx) {
             animator?.update()
             time++
         }
-        fun handleTap() {
-            animator?.startUpdating()
+        fun handleTap(x:Float,y:Float) {
+            animator?.startUpdating(x,y)
         }
     }
     companion object {
